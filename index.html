@@ -1,24 +1,416 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/deploy/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Speed Test</title>
-    <script type="module" crossorigin src="/deploy/assets/index-mrhVfgzF.js"></script>
-    <link rel="stylesheet" crossorigin href="/deploy/assets/index-b21SG8xJ.css">
-  </head>
-  <body>
-    <div class="app">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriAssist AI - Farmer Dashboard</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* --- THEME COLOR DEFINITIONS --- */
+        /* Default to dark theme if no data-theme is set */
+        :root, [data-theme='dark'] {
+            --color-primary: #11f7fb;
+            --color-secondary: #f918ee;
+            --color-bg-dark: #1a1a2e;
+            --color-card-bg: #2c2c47;
+            --color-text-light: #e0e0f8;
+            --color-border: #3f3f61; /* Dark border color */
+        }
 
-      <div class="timer">
-        <span id="min">00</span>
-        <span>:</span>
-        <span id="sec">00</span>
-        <span>:</span>
-        <span id="msec">00</span>
-      </div>
+        /* Light Theme Overrides */
+        [data-theme='light'] {
+            --color-primary: #0077ff; /* A bright blue */
+            --color-secondary: #ff33c4; /* A vibrant pink */
+            --color-bg-dark: #f0f4f8; /* Light background */
+            --color-card-bg: #ffffff;
+            --color-text-light: #1a1a2e; /* Dark text */
+            --color-border: #e0e0e0; /* Light border color */
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-light);
+            transition: background-color 0.3s, color 0.3s; /* Smooth transition for theme change */
+        }
 
+        /* Gradient applied to text and dynamic elements */
+        .text-gradient {
+            background-image: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Pulsing Border Effect for Key Cards */
+        .border-gradient-pulse {
+            border-image-slice: 1;
+            border-image-source: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+            animation: pulse-border 3s infinite;
+        }
+
+        .card {
+            background-color: var(--color-card-bg);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s;
+            border: 1px solid var(--color-border);
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(var(--color-secondary-rgb, 249, 24, 238), 0.3); /* Uses secondary color for hover effect */
+        }
+        
+        @keyframes pulse-border {
+            0% {
+                border-image-source: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+            }
+            50% {
+                border-image-source: linear-gradient(to right, var(--color-secondary), var(--color-primary));
+            }
+            100% {
+                border-image-source: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen" data-theme="dark">
+
+    <div id="app" class="p-4 md:p-8">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8 border-b pb-4" style="border-color: var(--color-border);">
+            <h1 class="text-3xl font-extrabold">
+                <span class="text-gradient" data-key="appTitle">AgriAssist AI</span>
+            </h1>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm font-medium hidden sm:inline" id="user-info"></span>
+                
+                <!-- Language Toggle Button -->
+                <button id="lang-toggle" onclick="toggleLanguage()" class="p-2 rounded-full transition duration-150 font-bold" 
+                        style="background-color: var(--color-card-bg); border: 1px solid var(--color-border); color: var(--color-secondary);">
+                    <span id="lang-text" class="text-sm">ML</span>
+                </button>
+
+                <!-- Theme Toggle Button -->
+                <button id="theme-toggle" onclick="toggleTheme()" class="p-2 rounded-full transition duration-150" 
+                        style="background-color: var(--color-card-bg); border: 1px solid var(--color-border);">
+                    <i id="theme-icon" data-lucide="sun" class="w-5 h-5"></i>
+                </button>
+                
+                <div class="w-8 h-8 rounded-full bg-gray-600 border-2" style="border-color: var(--color-primary);">
+                    <!-- Placeholder for User Avatar -->
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Left Column (AI Actions & Schedule) -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- AI Quick Actions Card -->
+                <div class="card p-6 rounded-xl border-b-4 border-gradient-pulse">
+                    <h2 class="text-2xl font-semibold mb-4 text-gradient" data-key="aiActionsTitle">AI Powered Actions</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <button onclick="alert('Image Diagnosis Feature is Active!')" class="p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition duration-150" style="background-color: var(--color-border); color: var(--color-text-light);">
+                            <i data-lucide="camera" class="w-6 h-6" style="color: var(--color-primary);"></i>
+                            <span class="text-xs font-medium text-center" data-key="diagnosePlant">Diagnose Plant</span>
+                        </button>
+                        <button onclick="alert('RAGs Chatbot is Active!')" class="p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition duration-150" style="background-color: var(--color-border); color: var(--color-text-light);">
+                            <i data-lucide="message-square" class="w-6 h-6" style="color: var(--color-secondary);"></i>
+                            <span class="text-xs font-medium text-center" data-key="askAIExpert">Ask AI Expert</span>
+                        </button>
+                        <button onclick="alert('Market Bidding Feature is Active!')" class="p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition duration-150" style="background-color: var(--color-border); color: var(--color-text-light);">
+                            <i data-lucide="gavel" class="w-6 h-6" style="color: var(--color-primary);"></i>
+                            <span class="text-xs font-medium text-center" data-key="startLiveBid">Start Live Bid</span>
+                        </button>
+                        <button onclick="alert('Yield Prediction is running.')" class="p-4 rounded-xl flex flex-col items-center justify-center space-y-2 transition duration-150" style="background-color: var(--color-border); color: var(--color-text-light);">
+                            <i data-lucide="trending-up" class="w-6 h-6" style="color: var(--color-secondary);"></i>
+                            <span class="text-xs font-medium text-center" data-key="predictYield">Predict Yield</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Planting Schedule Card -->
+                <div class="card p-6 rounded-xl">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center space-x-2">
+                        <i data-lucide="calendar-check" class="w-6 h-6" style="color: var(--color-primary);"></i>
+                        <span class="text-gradient" data-key="scheduleTitle">Optimized Planting Schedule</span>
+                    </h2>
+
+                    <table class="min-w-full text-left text-sm font-light">
+                        <thead class="border-b font-medium" style="border-color: var(--color-border);">
+                            <tr>
+                                <th scope="col" class="py-2 pr-4" data-key="tblCrop">Crop</th>
+                                <th scope="col" class="py-2 px-4" data-key="tblStartDate">Start Date</th>
+                                <th scope="col" class="py-2 px-4" data-key="tblRecYield">Recommended Yield</th>
+                                <th scope="col" class="py-2 pl-4 text-right" data-key="tblAction">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b hover:opacity-90 transition duration-150" style="border-color: var(--color-border);">
+                                <td class="py-3 pr-4 font-bold" style="color: var(--color-primary);">Black Pepper (KariMunda)</td>
+                                <td class="py-3 px-4">Oct 10, 2025</td>
+                                <td class="py-3 px-4 text-green-400">1200 Kg/Acre</td>
+                                <td class="py-3 pl-4 text-right"><button class="text-xs font-medium" style="color: var(--color-secondary);" data-key="viewDetails">View Details</button></td>
+                            </tr>
+                            <tr class="border-b hover:opacity-90 transition duration-150" style="border-color: var(--color-border);">
+                                <td class="py-3 pr-4 font-bold" style="color: var(--color-primary);">Cardamom (Elettaria)</td>
+                                <td class="py-3 px-4">Nov 05, 2025</td>
+                                <td class="py-3 px-4 text-green-400">450 Kg/Acre</td>
+                                <td class="py-3 pl-4 text-right"><button class="text-xs font-medium" style="color: var(--color-secondary);" data-key="viewDetails">View Details</button></td>
+                            </tr>
+                            <tr class="hover:opacity-90 transition duration-150">
+                                <td class="py-3 pr-4 font-bold" style="color: var(--color-primary);">Ginger (Zingiber)</td>
+                                <td class="py-3 px-4">Jan 20, 2026</td>
+                                <td class="py-3 px-4 text-green-400">7000 Kg/Acre</td>
+                                <td class="py-3 pl-4 text-right"><button class="text-xs font-medium" style="color: var(--color-secondary);" data-key="viewDetails">View Details</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <!-- Market Price Volatility -->
+                <div class="card p-6 rounded-xl">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center space-x-2">
+                        <i data-lucide="zap" class="w-6 h-6" style="color: var(--color-secondary);"></i>
+                        <span class="text-gradient" data-key="marketAlertTitle">Market Price Volatility Alert</span>
+                    </h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center p-3 rounded-lg border bg-yellow-900/20" style="border-color: var(--color-secondary);">
+                            <span class="font-medium" data-key="nutmegPrice">Nutmeg Prices (Current: ₹750/kg)</span>
+                            <span class="text-sm font-bold text-yellow-400">
+                                -4.2% in last 7 days
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 rounded-lg border bg-green-900/20" style="border-color: var(--color-primary);">
+                            <span class="font-medium" data-key="cardamomPrice">Cardamom (Export Grade)</span>
+                            <span class="text-sm font-bold text-green-400">
+                                +8.1% in last 7 days
+                            </span>
+                        </div>
+                        <p class="text-xs mt-3 text-gray-400" data-key="priceNote">
+                            *Prices are real-time, sourced from Kochi & Thiruvananthapuram wholesale markets. Use D2C Bidding for better margins.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column (Weather & Alerts) -->
+            <div class="space-y-6">
+                
+                <!-- Weather Card -->
+                <div class="card p-6 rounded-xl border-t-4 border-gradient-pulse">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center space-x-2">
+                        <i data-lucide="cloud-sun" class="w-6 h-6" style="color: var(--color-secondary);"></i>
+                        <span class="text-gradient" data-key="weatherTitle">Local Weather & Forecast</span>
+                    </h2>
+                    <div class="flex items-center space-x-4 mb-4">
+                        <div class="text-6xl font-extrabold" style="color: var(--color-primary);">28°C</div>
+                        <div>
+                            <p class="text-xl font-medium" data-key="weatherDesc">Partly Cloudy, Idukki</p>
+                            <p class="text-sm text-gray-400" data-key="weatherStats">Humidity: 85% | Wind: 5 km/h</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 3-Day Forecast -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center border-b pb-2" style="border-color: var(--color-border);">
+                            <span class="text-sm font-medium text-gray-300" data-key="daySat">Saturday</span>
+                            <span class="flex items-center space-x-2 text-sm">
+                                <i data-lucide="cloud-lightning" class="w-4 h-4 text-yellow-300"></i>
+                                <span>26°C / 20°C</span>
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center border-b pb-2" style="border-color: var(--color-border);">
+                            <span class="text-sm font-medium text-gray-300" data-key="daySun">Sunday</span>
+                            <span class="flex items-center space-x-2 text-sm">
+                                <i data-lucide="cloud-rain" class="w-4 h-4 text-blue-300"></i>
+                                <span>25°C / 19°C</span>
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-300" data-key="dayMon">Monday</span>
+                            <span class="flex items-center space-x-2 text-sm">
+                                <i data-lucide="sun" class="w-4 h-4 text-yellow-500"></i>
+                                <span>29°C / 21°C</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Critical Alerts Card -->
+                <div class="card p-6 rounded-xl">
+                    <h2 class="text-2xl font-semibold mb-4 flex items-center space-x-2">
+                        <i data-lucide="alert-triangle" class="w-6 h-6 text-red-500"></i>
+                        <span class="text-red-400 font-bold" data-key="alertsTitle">Critical Alerts</span>
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="p-3 bg-red-900/30 rounded-lg border border-red-500/50">
+                            <p class="font-bold text-red-400 flex items-center space-x-2 mb-1">
+                                <i data-lucide="droplet" class="w-5 h-5"></i>
+                                <span data-key="alertIrrigation">Irrigation Anomaly:</span>
+                            </p>
+                            <p class="text-sm" data-key="alertIrrigationText">Soil moisture sensor 4 shows critical low readings. **Immediate action required** for Pepper vines plot.</p>
+                        </div>
+                        <div class="p-3 bg-yellow-900/30 rounded-lg border border-yellow-500/50">
+                            <p class="font-bold text-yellow-400 flex items-center space-x-2 mb-1">
+                                <i data-lucide="bug" class="w-5 h-5"></i>
+                                <span data-key="alertPest">Pest Warning:</span>
+                            </p>
+                            <p class="text-sm" data-key="alertPestText">High risk of **Stem Borer** in the Cardamom plot due to heavy rain forecast.</p>
+                        </div>
+                        <div class="p-3 bg-indigo-900/30 rounded-lg border border-indigo-500/50">
+                            <p class="font-bold text-indigo-400 flex items-center space-x-2 mb-1">
+                                <i data-lucide="gauge" class="w-5 h-5"></i>
+                                <span data-key="alertSystem">System Check:</span>
+                            </p>
+                            <p class="text-sm" data-key="alertSystemText">Fertilizer Dosing System is running at 98% efficiency. Maintenance review recommended.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Links/Help -->
+                <div class="card p-4 rounded-xl text-center">
+                    <button class="w-full py-2 rounded-lg font-bold" style="background-color: var(--color-secondary); color: var(--color-bg-dark);">
+                        <i data-lucide="phone" class="w-4 h-4 inline mr-2"></i>
+                        <span data-key="contactDept">Contact Kerala Agri Dept.</span>
+                    </button>
+                </div>
+
+            </div>
+        </main>
+        
+        <!-- Footer / Credits -->
+        <footer class="mt-8 text-center text-xs text-gray-500 border-t pt-4" style="border-color: var(--color-border);">
+            <p data-key="footerText">AgriAssist AI Prototype | SIH 2025 PS-74 | Developed by [Your Team Name]</p>
+        </footer>
     </div>
-  </body>
+
+    <!-- Initialize Lucide icons and Theme Toggle Logic -->
+    <script>
+        lucide.createIcons();
+
+        // --- TRANSLATION DATA ---
+        const translations = {
+            appTitle: { en: 'AgriAssist AI', ml: 'അഗ്രിഅസിസ്റ്റ് എഐ' },
+            aiActionsTitle: { en: 'AI Powered Actions', ml: 'എഐ പിന്തുണയുള്ള പ്രവർത്തനങ്ങൾ' },
+            diagnosePlant: { en: 'Diagnose Plant', ml: 'ചെടി രോഗനിർണയം' },
+            askAIExpert: { en: 'Ask AI Expert', ml: 'എഐ വിദഗ്ദ്ധനോട് ചോദിക്കുക' },
+            startLiveBid: { en: 'Start Live Bid', ml: 'ലൈവ് ലേലം തുടങ്ങുക' },
+            predictYield: { en: 'Predict Yield', ml: 'വിളവ് പ്രവചിക്കുക' },
+            scheduleTitle: { en: 'Optimized Planting Schedule', ml: 'ഒപ്റ്റിമൈസ് ചെയ്ത നടീൽ ഷെഡ്യൂൾ' },
+            tblCrop: { en: 'Crop', ml: 'വിള' },
+            tblStartDate: { en: 'Start Date', ml: 'തുടക്ക തീയതി' },
+            tblRecYield: { en: 'Recommended Yield', ml: 'ശുപാർശ ചെയ്യുന്ന വിളവ്' },
+            tblAction: { en: 'Action', ml: 'പ്രവർത്തനം' },
+            viewDetails: { en: 'View Details', ml: 'വിശദാംശങ്ങൾ കാണുക' },
+            marketAlertTitle: { en: 'Market Price Volatility Alert', ml: 'വിപണി വിലയിലെ വ്യതിയാന അലർട്ട്' },
+            nutmegPrice: { en: 'Nutmeg Prices (Current: ₹750/kg)', ml: 'ജാതിക്ക വില (നിലവിൽ: ₹750/kg)' },
+            cardamomPrice: { en: 'Cardamom (Export Grade)', ml: 'ഏലം (കയറ്റുമതി ഗ്രേഡ്)' },
+            priceNote: { en: '*Prices are real-time, sourced from Kochi & Thiruvananthapuram wholesale markets. Use D2C Bidding for better margins.', ml: '*വിലകൾ കൊച്ചി, തിരുവനന്തപുരം മൊത്തവ്യാപാര വിപണികളിൽ നിന്നുള്ള തത്സമയ വിവരങ്ങളാണ്. മികച്ച ലാഭത്തിന് D2C ലേലം ഉപയോഗിക്കുക.' },
+            weatherTitle: { en: 'Local Weather & Forecast', ml: 'പ്രാദേശിക കാലാവസ്ഥാ പ്രവചനം' },
+            weatherDesc: { en: 'Partly Cloudy, Idukki', ml: 'ഭാഗികമായി മേഘാവൃതമാണ്, ഇടുക്കി' },
+            weatherStats: { en: 'Humidity: 85% | Wind: 5 km/h', ml: 'ഈർപ്പം: 85% | കാറ്റ്: 5 കി.മീ/മ' },
+            daySat: { en: 'Saturday', ml: 'ശനി' },
+            daySun: { en: 'Sunday', ml: 'ഞായർ' },
+            dayMon: { en: 'Monday', ml: 'തിങ്കൾ' },
+            alertsTitle: { en: 'Critical Alerts', ml: 'പ്രധാനപ്പെട്ട അലേർട്ടുകൾ' },
+            alertIrrigation: { en: 'Irrigation Anomaly:', ml: 'ജലസേചനത്തിലെ പ്രശ്നം:' },
+            alertIrrigationText: { en: 'Soil moisture sensor 4 shows critical low readings. **Immediate action required** for Pepper vines plot.', ml: 'മണ്ണിലെ ഈർപ്പം സെൻസർ 4 കുറഞ്ഞ അളവുകൾ കാണിക്കുന്നു. കുരുമുളക് തോട്ടത്തിന് **അടിയന്തര നടപടി ആവശ്യമാണ്**.' },
+            alertPest: { en: 'Pest Warning:', ml: 'കീട മുന്നറിയിപ്പ്:' },
+            alertPestText: { en: 'High risk of **Stem Borer** in the Cardamom plot due to heavy rain forecast.', ml: 'കനത്ത മഴ കാരണം ഏലത്തോട്ടത്തിൽ **തണ്ടുതുരപ്പൻ** സാധ്യത കൂടുതൽ.' },
+            alertSystem: { en: 'System Check:', ml: 'സിസ്റ്റം പരിശോധന:' },
+            alertSystemText: { en: 'Fertilizer Dosing System is running at 98% efficiency. Maintenance review recommended.', ml: 'വളം നൽകുന്ന സിസ്റ്റം 98% കാര്യക്ഷമതയിൽ പ്രവർത്തിക്കുന്നു. മെയിന്റനൻസ് റിവ്യൂ ശുപാർശ ചെയ്യുന്നു.' },
+            contactDept: { en: 'Contact Kerala Agri Dept.', ml: 'കേരള കാർഷിക വകുപ്പുമായി ബന്ധപ്പെടുക' },
+            footerText: { en: 'AgriAssist AI Prototype | SIH 2025 PS-74 | Developed by [Your Team Name]', ml: 'അഗ്രിഅസിസ്റ്റ് എഐ പ്രോട്ടോടൈപ്പ് | SIH 2025 PS-74 | [നിങ്ങളുടെ ടീമിന്റെ പേര്] വികസിപ്പിച്ചത്' },
+        };
+
+        let currentLang = localStorage.getItem('language') || 'en'; // Default to English
+
+        function updateText() {
+            const lang = currentLang;
+            const langTextElement = document.getElementById('lang-text');
+            
+            // Update toggle button text
+            if (lang === 'en') {
+                langTextElement.textContent = 'ML';
+                document.documentElement.setAttribute('lang', 'en');
+            } else {
+                langTextElement.textContent = 'EN';
+                document.documentElement.setAttribute('lang', 'ml');
+            }
+
+            // Update user info (special case)
+            document.getElementById('user-info').textContent = (currentLang === 'en' ? 'Kerala Farmer' : 'കേരള കർഷകൻ') + ' (User ID: 497B-73C)';
+
+
+            // Update all elements with data-key
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (translations[key] && translations[key][lang]) {
+                    // Check if the element contains bold markdown and handle it for display
+                    let text = translations[key][lang];
+                    if (text.includes('**')) {
+                         text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                         el.innerHTML = text;
+                    } else {
+                        el.textContent = text;
+                    }
+                }
+            });
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'ml' : 'en';
+            localStorage.setItem('language', currentLang);
+            updateText();
+        }
+
+        // --- THEME LOGIC (Kept from previous version) ---
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const iconElement = document.getElementById('theme-icon');
+            if (iconElement) {
+                iconElement.removeAttribute('data-lucide'); 
+                
+                if (theme === 'dark') {
+                    iconElement.setAttribute('data-lucide', 'sun');
+                    iconElement.style.color = '#facc15'; 
+                } else {
+                    iconElement.setAttribute('data-lucide', 'moon');
+                    iconElement.style.color = '#4f46e5'; 
+                }
+                lucide.createIcons();
+            }
+        }
+
+        // Initialize theme and language on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme initialization
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+
+            // Language initialization
+            currentLang = localStorage.getItem('language') || 'en';
+            updateText();
+        });
+    </script>
+</body>
 </html>
